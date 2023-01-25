@@ -33,7 +33,7 @@ bot.hear(/\/id/i, async (context) => {
 bot.hear(/\/анекдот/i, async (context) => {
   const anek = await axios.get("https://www.anekdot.ru/random/anekdot/");
   const parsed = parser.parse(anek.data).querySelector(".text").rawText;
-
+  //
   await context.send(parsed);
 });
 module.exports = { init, sendMessage, getConversations };
