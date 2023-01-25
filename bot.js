@@ -30,6 +30,17 @@ vk.updates.on("message_new", bot.middleware);
 bot.hear(/\/id/i, async (context) => {
   await context.send(context.peerId);
 });
+bot.hear(/\/кто/i, async (context) => {
+  const members = await vk.api.messages.getConversationMembers({
+    peer_id: context.peerId,
+  });
+  const random =
+    members.profiles[Math.floor(Math.random() * members.profiles.length)];
+  console.log(random);
+  await context.send(
+    `Это [id${random.id}|${random.first_name} ${random.last_name}]`
+  );
+});
 bot.hear(/\/анекдот/i, async (context) => {
   const anek = await axios.get("https://www.anekdot.ru/random/anekdot/");
   const parsed = parser.parse(anek.data).querySelector(".text").rawText;
