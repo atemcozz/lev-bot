@@ -1,9 +1,9 @@
 const { VK } = require("vk-io");
 const { HearManager } = require("@vk-io/hear");
-
+const { default: axios } = require("axios");
+const parser = require("node-html-parser");
 const vk = new VK({
-  token:
-    "vk1.a.QdEVB1DzIendbTSEXFN93QSf1M4LuVRKbIzSgJkXaz4-IBNx7yUn8S1mGajugMlIT7V-HP9sTH2rVpW83NT24gdew9n17eTIoDzci2hUGKqjX9tIlkHHiPoPgZSCUmuRVsT-uNgCgURIeQAFaLdMSRp12--3m5q3uJp5hdPiku9z8OL6XoDn6fM6gjUKuldr-W2dbC_5yFVQjAuNY_-FFQ",
+  token: process.env.VK_TOKEN,
 });
 const bot = new HearManager();
 
@@ -26,11 +26,14 @@ async function getConversations() {
   const conversations = await vk.api.messages.getConversations();
   return conversations;
 }
-vk.updates.on("message_new", async (context) => {
-  console.log(context);
-  if (context.text === "id") {
-    await context.send(context.peerId);
-  }
+vk.updates.on("message_new", bot.middleware);
+bot.hear(/\/id/i, async (context) => {
+  await context.send(context.peerId);
 });
+bot.hear(/\/анекдот/i, async (context) => {
+  const anek = await axios.get("https://www.anekdot.ru/random/anekdot/");
+  const parsed = parser.parse(anek.data).querySelector(".text").rawText;
 
+  await context.send(parsed);
+});
 module.exports = { init, sendMessage, getConversations };
